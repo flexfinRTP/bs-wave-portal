@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { ethers } from "ethers";
 import "./App.css";
+import abi from "./utils/WavePortal.json";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
+  /**
+ * Create a variable here that holds the contract address after you deploy!
+ */
+  const contractAddress = "0x0B7401824937BB1610E6266d205C4EFFd7091be6";
+  const contractABI = abi.abi;
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -50,6 +57,37 @@ const App = () => {
     }
   }
 
+  const wave = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        let count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total guestbook signs...", count.toNumber());
+
+        /*
+        * Execute the actual wave from your smart contract
+        */
+        const waveTxn = await wavePortalContract.wave();
+        console.log("Mining...", waveTxn.hash);
+
+        await waveTxn.wait();
+        console.log("Mined -- ", waveTxn.hash);
+
+        count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total guestbook signs...", count.toNumber());
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, [])
@@ -67,7 +105,7 @@ const App = () => {
               Please Connect Web3 Wallet
             </button>
           )}
-          
+
           <br />
 
           💪🏻🧠🦅 Welcome to Justin's Web3 Guestbook! 🦅🧠💪🏻
@@ -76,6 +114,8 @@ const App = () => {
         <div className="bio">
           Hello, Connect your Metamask wallet and sign my guestbook!
         </div>
+
+        {/* <div className="bio">Total Waves: {getWaveCount()}</div> */}
         <br />
         {/* <button className="waveButton" onClick={wave}>
           Sign the guestbook.
@@ -88,7 +128,7 @@ const App = () => {
           <option value="fly">🦅Be able to fly</option>
         </select>
         <br />
-        <button type="submit" onClick={null}>If you could have one of these superpowers, which one would you choose?</button>
+        <button type="submit" onClick={wave}>If you could have one of these superpowers, which one would you choose?</button>
       </div>
     </div>
   );
