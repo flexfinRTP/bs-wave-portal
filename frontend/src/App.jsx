@@ -77,8 +77,9 @@ const App = () => {
         /*
         * Execute the actual wave from your smart contract
         */
-        const waveTxn = await wavePortalContract.wave();
-        console.log("Mining...", waveTxn.hash);
+        const waveTxn = await wavePortalContract.wave("this is a message")
+        // const waveTxn = await wavePortalContract.wave();
+        // console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
