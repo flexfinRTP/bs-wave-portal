@@ -178,7 +178,7 @@ const App = () => {
           <option value="fly">🦅Be able to fly</option>
         </select>
         <br />
-        <button type="submit" onClick={}>If you could have one of these superpowers, which one would you choose?</button>
+        <button type="submit" onClick={getAllWaves}>If you could have one of these superpowers, which one would you choose?</button>
 
         {allWaves.map((wave, index) => {
           return (
