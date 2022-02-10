@@ -69,7 +69,6 @@ const App = () => {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-        const waveTxn = await wavePortalContract.wave("this is a message")
 
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total guestbook signs...", count.toNumber());
