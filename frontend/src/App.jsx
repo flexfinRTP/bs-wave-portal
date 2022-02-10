@@ -76,7 +76,7 @@ const App = () => {
         /*
         * Execute the actual wave from your smart contract
         */
-        const waveTxn = await wavePortalContract.wave("this is a message")
+        const waveTxn = await wavePortalContract.wave(toString(`${wave.message}`));
         // const waveTxn = await wavePortalContract.wave();
         // console.log("Mining...", waveTxn.hash);
 
@@ -146,21 +146,20 @@ const App = () => {
         */}
           {!currentAccount && (
             <button className="waveButton" onClick={connectWallet}>
-              Please Connect Web3 Wallet
+              Connect Web3 Wallet
             </button>
           )}
 
           <br />
+          <br />
 
-          💪🏻🧠🦅 Welcome to Justin's Web3 Guestbook! 🦅🧠💪🏻
+          💪🏻🧠🦅 Welcome to Justin's 
+          
+          <br />Web3 Guestbook! 🦅🧠💪🏻
         </div>
 
-        <button className="waveButton" onClick={wave}>
-          Wave at Me
-        </button>
-
         <div className="bio">
-          Hello, Connect your Metamask wallet and sign my guestbook!
+          Welcome, Connect your Metamask wallet and sign my guestbook!
         </div>
 
 
@@ -177,8 +176,26 @@ const App = () => {
           <option value="minds">🧠Read minds</option>
           <option value="fly">🦅Be able to fly</option>
         </select>
+        <button className="waveButton" type="submit" onClick={getAllWaves}>If you could have one of these superpowers, which one would you choose?</button>
         <br />
-        <button type="submit" onClick={getAllWaves}>If you could have one of these superpowers, which one would you choose?</button>
+
+        <button className="waveButton" onClick={wave}>
+          Sign the Guestbook!
+        </button>
+        <br />
+        <br />
+        {/* Text area to sign msg form, need to add msg store to contract and FE funcs, need onsumbit func to submit msg to exsisting getallwaves func(?) */}
+        <form>
+          <label>
+            Write your message to the blockchain:
+            <br />
+            <input type="text" />
+          </label>
+          <input className="waveButton" type="submit" value="Sign Here" onSubmit={wave}/>
+        </form>
+
+        <br />
+        <button className="waveButton" type="submit" onClick={getAllWaves}>Display Guestbook Signatures</button>
 
         {allWaves.map((wave, index) => {
           return (

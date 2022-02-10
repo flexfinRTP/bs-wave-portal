@@ -26,6 +26,7 @@ contract WavePortal {
      * This is what lets me hold all the waves anyone ever sends to me!
      */
     Wave[] waves;
+    
     // address public waver = msg.sender;
     address[] public waveList;
 
