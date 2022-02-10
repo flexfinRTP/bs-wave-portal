@@ -1,8 +1,29 @@
-# Basic Sample Hardhat Project
+## Web3 Guestbook
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+Welcome to my Web3 guestbook, please sign the guestbook and leave a message.
 
-Try running some of the following tasks:
+How to run below.
+
+# Install
+-go to /root/
+npm install
+-go to /frontend/
+npm install
+-run FE env
+npm start
+
+# dev script
+npx hardhat run scripts/run.js
+# deploy to hardhat local blockchain env
+npx hardhat run scripts/deploy.js --network localhost
+# deploy to Rinkeby Ethereum Testnet env
+npx hardhat run scripts/deploy.js --network rinkeby
+
+# Reminder
+After deploying contract(s) with code changes, update frontend with new contract address (App.jsx) and new ABI json file (/src/utils/).
+Then connect and test FE functionality.
+
+# Hardhat commands:
 
 ```shell
 npx hardhat accounts
