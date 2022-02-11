@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -13,7 +14,7 @@ const App = () => {
   const [allWaves, setAllWaves] = useState([]); //prop to store all waves
   const [allVotes, setAllVotes] = useState([]); //prop to store all votes
 
-  const contractAddress = "0x00Aa5533C14EaA04612223E4F120fa4efe6AC6B6"; //holds the contract address after being deployed.
+  const contractAddress = "0xF6CCA52009B9681f133C643E0e8152EE57793517"; //holds the contract address after being deployed.
   const contractABI = abi.abi;
 
   const checkIfWalletIsConnected = async () => {
@@ -102,7 +103,7 @@ const App = () => {
         let count = await wavePortalContract.getTotalVotes();
         console.log("Retrieved total votes from poll...", count.toNumber());
 
-        const voteTxn = await wavePortalContract.vote(message || "Vote Fail."); //call vote
+        const voteTxn = await wavePortalContract.vote(voteData || "Vote Fail."); //call vote
         // const voteTxn = await votePortalContract.vote();
         // console.log("Mining...", voteTxn.hash);
 
@@ -161,7 +162,7 @@ const App = () => {
           votesCleaned.push({
             address: vote.voter,
             timestamp: new Date(vote.timestamp * 1000),
-            message: vote.voteData
+            voteData: vote.voteData
           });
         });
 
@@ -186,12 +187,14 @@ const App = () => {
           {/*
         * If there is no currentAccount render this button
         */}
+          <br />
+          <br />
           {!currentAccount && (
             <button className="waveButton" onClick={connectWallet}>
               Connect Metamask Wallet
             </button>
           )}
-          <p>Don't have metamask? Get the official wallet from <a href="http://accruefg.com/">here</a></p>
+          <p>Don't have metamask? Get the official wallet from <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en" target="_blank">here</a></p>
 
           <br />
           <br />
@@ -221,7 +224,7 @@ const App = () => {
             <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
               <div>Address: {vote.address}</div>
               <div>Time: {vote.timestamp.toString()}</div>
-              <div>Choice: {vote.voteData}</div>
+              <div>Vote Data: {vote.voteData}</div>
             </div>)
         })}
 
