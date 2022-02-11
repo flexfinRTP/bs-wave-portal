@@ -6,29 +6,25 @@ import "hardhat/console.sol";
 
 contract WavePortal {
     uint256 totalWaves;
+    uint256 totalVotes;
 
-    /*
-     * A little magic, Google what events are in Solidity!
-     */
     event NewWave(address indexed from, uint256 timestamp, string message);
+    event NewVote(address indexed from, uint256 timestamp, string voteData);
 
-    /*
-     * I created a struct here named Wave.
-     * A struct is basically a custom datatype where we can customize what we want to hold inside it.
-     */
     struct Wave {
         address waver; // The address of the user who waved.
         string message; // The message the user sent.
         uint256 timestamp; // The timestamp when the user waved.
     }
-    /*
-     * I declare a variable waves that lets me store an array of structs.
-     * This is what lets me hold all the waves anyone ever sends to me!
-     */
-    Wave[] waves;
 
-    // address public waver = msg.sender;
-    address[] public waveList;
+    struct Vote {
+        address voter; // address of user who voted.
+        string voteData; // who the vote was for? from option poll?
+        uint256 timestamp;
+    }
+
+    Wave[] waves; //Holds all the waves ever sent
+    Vote[] votes; //Holds all votes
 
     constructor() payable {
         console.log(
@@ -36,12 +32,8 @@ contract WavePortal {
         );
     }
 
-    /*
-     * You'll notice I changed the wave function a little here as well and
-     * now it requires a string called _message. This is the message our user
-     * sends us from the frontend!
-     */
     function wave(string memory _message) public {
+        //string _message. the message our user sends us from the frontend!
         totalWaves += 1;
         console.log("%s has waved!", msg.sender);
 
@@ -58,18 +50,47 @@ contract WavePortal {
         require(success, "Failed to withdraw money from contract.");
     }
 
+    function vote(string memory _voteData) public {
+        //string _voteData. the voteData our user sends us from the frontend!
+        totalVotes += 1;
+        console.log("%s has voted!", msg.sender);
+
+        votes.push(Vote(msg.sender, _voteData, block.timestamp));
+
+        emit NewVote(msg.sender, block.timestamp, _voteData);
+
+        uint256 voteFee = 0.0025 ether; //init vote fee for voting in poll
+        require(
+            voteFee <= address(msg.sender).balance, //user to have more than the fee or contract fails?
+            "Trying to withdraw more money than the user has."
+        );
+        (bool success, ) = (msg.sender).call{value: voteFee}("");
+        require(success, "Failed to withdraw money from user.");
+    }
+
     /*
-     * I added a function getAllWaves which will return the struct array, waves, to us.
-     * This will make it easy to retrieve the waves from our website!
+     * getAllWaves will return the struct array waves[]
+     * Able to retrieve the waves from our website!
      */
     function getAllWaves() public view returns (Wave[] memory) {
         return waves;
     }
 
+    /*
+     * getAllVotes will return the struct array votes[]
+     * Able to retrieve the votes from our website!
+     */
+    function getAllVotes() public view returns (Vote[] memory) {
+        return votes;
+    }
+
     function getTotalWaves() public view returns (uint256) {
-        // Optional: Add this line if you want to see the contract print the value!
-        // We'll also print it over in run.js as well.
         console.log("We have %d total waves!", totalWaves);
         return totalWaves;
+    }
+
+    function getTotalVotes() public view returns (uint256) {
+        console.log("We have %d total waves!", totalVotes);
+        return totalVotes;
     }
 }

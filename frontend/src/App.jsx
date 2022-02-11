@@ -5,14 +5,15 @@ import abi from "./utils/WavePortal.json";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
-  /*
- * All state property to store all waves
- */
-  const [allWaves, setAllWaves] = useState([]);
-  /**
- * Create a variable here that holds the contract address after you deploy!
- */
-  const contractAddress = "0xA9dC0aA82E1435136E3C409B80458587aD308aA1";
+  const [message, setMessage] = useState("");
+  const [voteData, setVoteData] = useState();
+  const [totalVotes, setTotalVotes] = useState(0); //stores the calculated total of all votes submitted.
+  const [voted, setVoted] = useState(false); //used to check if the user has already voted.
+
+  const [allWaves, setAllWaves] = useState([]); //prop to store all waves
+  const [allVotes, setAllVotes] = useState([]); //prop to store all votes
+
+  const contractAddress = "0x00Aa5533C14EaA04612223E4F120fa4efe6AC6B6"; //holds the contract address after being deployed.
   const contractABI = abi.abi;
 
   const checkIfWalletIsConnected = async () => {
@@ -40,15 +41,12 @@ const App = () => {
     }
   }
 
-  /**
-  * Implement your connectWallet method here
-  */
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
 
       if (!ethereum) {
-        alert("Please install MetaMask!");
+        alert("Install MetaMask!");
         return;
       }
 
@@ -73,18 +71,46 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total guestbook signs...", count.toNumber());
 
-        /*
-        * Execute the actual wave from your smart contract
-        */
-        const waveTxn = await wavePortalContract.wave(toString(`${wave.message}`));
+        // const waveTxn = await wavePortalContract.wave(wave.message); //call wave
         // const waveTxn = await wavePortalContract.wave();
         // console.log("Mining...", waveTxn.hash);
+
+        let waveTxn = await wavePortalContract.wave(message || "Signed.", { gasLimit: 300000 });//call wave { gasLimit: 300000 }
 
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
 
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total guestbook signs...", count.toNumber());
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const vote = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        let count = await wavePortalContract.getTotalVotes();
+        console.log("Retrieved total votes from poll...", count.toNumber());
+
+        const voteTxn = await wavePortalContract.vote(message || "Vote Fail."); //call vote
+        // const voteTxn = await votePortalContract.vote();
+        // console.log("Mining...", voteTxn.hash);
+
+        await voteTxn.wait();
+        console.log("Mined -- ", voteTxn.hash);
+
+        count = await wavePortalContract.getTotalVotes();
+        console.log("Retrieved total votes from poll...", count.toNumber());
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -100,17 +126,8 @@ const App = () => {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+        const waves = await wavePortalContract.getAllWaves(); //Call the getAllVotes method from your Smart Contract
 
-        /*
-         * Call the getAllWaves method from your Smart Contract
-         */
-        const waves = await wavePortalContract.getAllWaves();
-
-
-        /*
-         * We only need address, timestamp, and message in our UI so let's
-         * pick those out
-         */
         let wavesCleaned = [];
         waves.forEach(wave => {
           wavesCleaned.push({
@@ -120,10 +137,35 @@ const App = () => {
           });
         });
 
-        /*
-         * Store our data in React State
-         */
-        setAllWaves(wavesCleaned);
+        setAllWaves(wavesCleaned); //store in react state
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getAllVotes = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const votes = await wavePortalContract.getAllVotes(); //Call the getAllVotes method from your Smart Contract
+
+        let votesCleaned = [];
+        votes.forEach(vote => {
+          votesCleaned.push({
+            address: vote.voter,
+            timestamp: new Date(vote.timestamp * 1000),
+            message: vote.voteData
+          });
+        });
+
+        setAllVotes(votesCleaned); //store in react state
       } else {
         console.log("Ethereum object doesn't exist!")
       }
@@ -146,53 +188,49 @@ const App = () => {
         */}
           {!currentAccount && (
             <button className="waveButton" onClick={connectWallet}>
-              Connect Web3 Wallet
+              Connect Metamask Wallet
             </button>
           )}
+          <p>Don't have metamask? Get the official wallet from <a href="http://accruefg.com/">here</a></p>
 
           <br />
           <br />
 
-          💪🏻🧠🦅 Welcome to Justin's 
-          
-          <br />Web3 Guestbook! 🦅🧠💪🏻
+          🦅🦅🦅 Welcome to Justin's
+
+          <br />Web3 Guestbook! 🦅🦅🦅
         </div>
 
         <div className="bio">
-          Welcome, Connect your Metamask wallet and sign my guestbook!
+          Welcome, Connect your Metamask wallet and sign my guestbook and vote in the poll!
         </div>
 
-
-
-        {/* <div className="bio">Total Waves: {getWaveCount()}</div> */}
-        <br />
-        {/* <button className="waveButton" onClick={wave}>
-          Sign the guestbook.
-        </button> */}
         <select>
-          <option defaultValue="invisible">👀Be invisible whenever you want</option>
-          <option value="strength">💪🏻Superhuman Strength</option>
-          <option value="animal">🐶Talk to animals</option>
-          <option value="minds">🧠Read minds</option>
-          <option value="fly">🦅Be able to fly</option>
+          <option defaultValue="invisible" onChange={e => setVoteData(e.target.value)}>👀Be invisible whenever you want</option>
+          <option value="strength" onChange={e => setVoteData(e.target.value)}>💪🏻Superhuman Strength</option>
+          <option value="animal" onChange={e => setVoteData(e.target.value)}>🐶Talk to animals</option>
+          <option value="minds" onChange={e => setVoteData(e.target.value)}>🧠Read minds</option>
+          <option value="fly" onChange={e => setVoteData(e.target.value)}>🦅Be able to fly</option>
         </select>
-        <button className="waveButton" type="submit" onClick={getAllWaves}>If you could have one of these superpowers, which one would you choose?</button>
+        <button className="waveButton" type="submit" onChange={e => setVoteData(e.target.value)} onClick={vote}>If you could have one of these superpowers, which one would you choose?</button>
         <br />
+        <button className="waveButton" type="submit" onClick={getAllVotes}>Get the votes.</button>
 
-        <button className="waveButton" onClick={wave}>
-          Sign the Guestbook!
-        </button>
+        {allVotes.map((vote, index) => {
+          return (
+            <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+              <div>Address: {vote.address}</div>
+              <div>Time: {vote.timestamp.toString()}</div>
+              <div>Choice: {vote.voteData}</div>
+            </div>)
+        })}
+
         <br />
         <br />
+        <p>Sign a message below and press Sign.</p><p>Your message is stored in the blockchain forever!</p>
         {/* Text area to sign msg form, need to add msg store to contract and FE funcs, need onsumbit func to submit msg to exsisting getallwaves func(?) */}
-        <form>
-          <label>
-            Write your message to the blockchain:
-            <br />
-            <input type="text" />
-          </label>
-          <input className="waveButton" type="submit" value="Sign Here" onSubmit={wave}/>
-        </form>
+        <textarea onChange={e => setMessage(e.target.value)}></textarea>
+        <button className="button" onClick={wave}> Sign </button>
 
         <br />
         <button className="waveButton" type="submit" onClick={getAllWaves}>Display Guestbook Signatures</button>
