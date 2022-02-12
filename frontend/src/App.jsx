@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -184,6 +185,25 @@ const App = () => {
 
       <div className="dataContainer">
         <div className="header">
+          <>
+            <Navbar bg="light" expand="lg">
+              <Container>
+                <Navbar.Brand href="#home">Web3 Guestbook</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                  <Nav className="me-auto">
+                    <Nav.Link href="/home">Home</Nav.Link>
+                    <Nav.Link href="/vote-records">Records</Nav.Link>
+                    <NavDropdown title="More" id="basic-nav-dropdown">
+                      <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
+                      <NavDropdown.Divider />
+                      <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
+                    </NavDropdown>
+                  </Nav>
+                </Navbar.Collapse>
+              </Container>
+            </Navbar>
+          </>
           {/*
         * If there is no currentAccount render this button
         */}
@@ -194,20 +214,17 @@ const App = () => {
               Connect Metamask Wallet
             </button>
           )}
-          <p>Don't have metamask? Get the official wallet from <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en" target="_blank">here</a></p>
+          <div style={{ fontSize: "2.25rem" }}>
+            🦅🦅🦅 Welcome to Justin's
 
-          <br />
-          <br />
-
-          🦅🦅🦅 Welcome to Justin's
-
-          <br />Web3 Guestbook! 🦅🦅🦅
+            <br />Web3 Guestbook! 🦅🦅🦅
+          </div>
         </div>
 
-        <div className="bio">
+        <div style={{ fontSize: "1.5rem" }} className="bio">
           Welcome, Connect your Metamask wallet and sign my guestbook and vote in the poll!
         </div>
-
+        <br />
         <select>
           <option defaultValue="invisible" onChange={e => setVoteData(e.target.value)}>👀Be invisible whenever you want</option>
           <option value="strength" onChange={e => setVoteData(e.target.value)}>💪🏻Superhuman Strength</option>
